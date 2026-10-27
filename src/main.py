@@ -204,8 +204,8 @@ def main():
     # out = sift_match_align(out, out_g, test_img, test_g, 3, 1, 1)
 
     cv2.imwrite("new_image.jpg", out)
-    plt.imshow(out)
-    plt.show()
+    # plt.imshow(out)
+    # plt.show()
 
 
 if __name__ == '__main__':
