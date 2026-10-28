@@ -14,6 +14,9 @@ positional arguments:
 ```
 
 ```
+positional arguments:
+  image_path
+
 options:
   -h, --help            show this help message and exit
   --transform_algorithm TRANSFORM_ALGORITHM
@@ -29,6 +32,13 @@ options:
   --show_outlier SHOW_OUTLIER
                         shows outliers for debug_draw only when it is set to 2
   --use_mean USE_MEAN   set to 1 if you want reprojection error to be calculated with mean, 0 for median
+
+  it's important to mention that image_path should point to a folder that contains the images for the panorama
+  all of the file names should be the same, except for the attaching number in the end. for example:
+  image_folder:
+    img_1.jpg -- stitches at the end
+    img_2.jpg -- stitches to reference image
+    img_3.jpg -- reference image
 ```
 
 
