@@ -22,8 +22,14 @@ def computePointHomography(M, points):
     out = np.dot(M, points)
     return np.array([out[0]/out[2],out[1]/out[2]])
 
+def downscale(img):
+    (h, w) = img.shape[:2];
+    s = 20000/max(h,w)
+    return img if s >= 1 else cv2.resize(img, None, fx=s, fy=s, interpolation=cv2.INTER_AREA)
+
 def sift_match_align(l_img, l_gray, r_img, r_gray, kept_matches, align, neighbor_threshold, ransac_threshold, debug, show_outlier, use_mean, ransac_iterations):
-    sift = cv2.SIFT_create()
+    sift = cv2.SIFT_create(nfeatures=10000)
+
 
     l_kp, l_des = sift.detectAndCompute(l_gray, None)
     r_kp, r_des = sift.detectAndCompute(r_gray, None)
@@ -32,9 +38,9 @@ def sift_match_align(l_img, l_gray, r_img, r_gray, kept_matches, align, neighbor
     matches = bf.knnMatch(l_des, r_des, k=2)
 
     good_matches = []
-    for m,n in matches:
-        if m.distance < neighbor_threshold*n.distance:
-            good_matches.append(m)
+    for pair in matches:
+        if len(pair) == 2 and pair[0].distance < neighbor_threshold*pair[1].distance:
+            good_matches.append(pair[0])
 
     
     kept_matches = good_matches
@@ -104,6 +110,7 @@ def sift_match_align(l_img, l_gray, r_img, r_gray, kept_matches, align, neighbor
         return debug_img
 
 
+    print(M)
     img_aligned = cv2.cvtColor(cv2.warpPerspective(r_img, M, (l_w + r_w, l_h)), cv2.COLOR_RGB2RGBA)
     l_img_a = cv2.cvtColor(l_img, cv2.COLOR_RGB2RGBA)
     l_img_aligned = np.zeros(img_aligned.shape, dtype=np.uint8)
@@ -172,8 +179,9 @@ def main():
 
     dir_path = Path(args.image_path)
 
-    images = list(map(cv2.imread, list(str(file) for file in dir_path.iterdir() if file.is_file)))
+    images = list(map(cv2.imread, list(str(file) for file in dir_path.iterdir() if file.is_file())))
     images.reverse()
+    images = [downscale(img) for img in images]
 
     images_g = list(map(lambda x:cv2.cvtColor(x, cv2.COLOR_BGR2GRAY), images))
 
